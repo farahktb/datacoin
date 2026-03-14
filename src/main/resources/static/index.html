@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DataCoin | Real-Time Crypto Analytics Dashboard</title>
+    <meta name="description" content="Real-time cryptocurrency market analytics dashboard. Track prices, volume, market cap, and trends for top 20 cryptocurrencies powered by CoinGecko data." />
+    <meta property="og:title" content="DataCoin" />
+    <meta property="og:description" content="Real-time crypto market data pipeline and analytics dashboard." />
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+    <!-- =================== HEADER =================== -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">⬡</span>
+                <span class="logo-text">Data<span class="logo-accent">Coin</span></span>
+            </div>
+            <div class="header-actions">
+                <div class="live-indicator">
+                    <span class="pulse-dot"></span>
+                    <span>LIVE DATA</span>
+                </div>
+                <button id="refreshBtn" class="btn-refresh" onclick="refreshData()">
+                    <span id="refreshIcon">↻</span> Refresh
+                </button>
+                <div class="last-update" id="lastUpdate">Fetching data...</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =================== MAIN =================== -->
+    <main class="main">
+
+        <!-- GLOBAL MARKET STATS BANNER -->
+        <section class="stats-banner">
+            <div class="stat-chip">
+                <span class="stat-label">Market Cap</span>
+                <span class="stat-value" id="totalMarketCap">—</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+                <span class="stat-label">24h Volume</span>
+                <span class="stat-value" id="totalVolume">—</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+                <span class="stat-label">BTC Dominance</span>
+                <span class="stat-value" id="btcDominance">—</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+                <span class="stat-label">Gainers / Losers</span>
+                <span class="stat-value" id="gainersLosers">— / —</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-chip">
+                <span class="stat-label">Data Points Collected</span>
+                <span class="stat-value" id="dataPoints">—</span>
+            </div>
+        </section>
+
+        <!-- DASHBOARD GRID -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Price Table -->
+            <section class="card card-table">
+                <div class="card-header">
+                    <h2 class="card-title">📊 Market Overview</h2>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="Search coin..." oninput="filterCoins()" />
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table class="crypto-table" id="cryptoTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Coin</th>
+                                <th>Price</th>
+                                <th>1h %</th>
+                                <th>24h %</th>
+                                <th>7d %</th>
+                                <th>Market Cap</th>
+                                <th>Volume 24h</th>
+                                <th>ATH</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coinsTableBody">
+                            <tr><td colspan="9" class="loading-cell">
+                                <div class="loader"></div> Loading market data...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- RIGHT: Charts & Gainers -->
+            <div class="right-panel">
+
+                <!-- Price Chart -->
+                <section class="card card-chart">
+                    <div class="card-header">
+                        <h2 class="card-title">📈 Price History</h2>
+                        <div class="coin-selector">
+                            <select id="chartCoinSelect" onchange="loadCoinChart()">
+                                <option value="">Select a coin...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="priceChart"></canvas>
+                        <div id="chartPlaceholder" class="chart-placeholder">
+                            <span>🔍</span>
+                            <p>Select a coin to view its price history</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Gainers & Losers Side by Side -->
+                <div class="gainers-losers-row">
+                    <!-- Top Gainers -->
+                    <section class="card card-gainers">
+                        <div class="card-header">
+                            <h2 class="card-title">🚀 Top Gainers <span class="badge badge-green">24h</span></h2>
+                        </div>
+                        <ul class="gainer-loser-list" id="gainersList">
+                            <li class="loading-item">Loading...</li>
+                        </ul>
+                    </section>
+
+                    <!-- Top Losers -->
+                    <section class="card card-losers">
+                        <div class="card-header">
+                            <h2 class="card-title">📉 Top Losers <span class="badge badge-red">24h</span></h2>
+                        </div>
+                        <ul class="gainer-loser-list" id="losersList">
+                            <li class="loading-item">Loading...</li>
+                        </ul>
+                    </section>
+                </div>
+
+                <!-- Market Cap Distribution Donut Chart -->
+                <section class="card card-donut">
+                    <div class="card-header">
+                        <h2 class="card-title">🍩 Market Cap Distribution</h2>
+                    </div>
+                    <div class="donut-container">
+                        <canvas id="donutChart"></canvas>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =================== FOOTER =================== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                Built with <span style="color:#8b5cf6;">♥</span> using
+                <strong>Java Spring Boot</strong> + <strong>CoinGecko API</strong>
+            </div>
+            <div class="footer-links">
+                <a href="/api/health" target="_blank">API Health</a>
+                <a href="/api/coins" target="_blank">Coins API</a>
+                <a href="/h2-console" target="_blank">DB Console</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Main JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

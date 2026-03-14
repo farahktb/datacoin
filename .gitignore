@@ -1,0 +1,39 @@
+# Maven build output
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.classpath
+*.project
+*.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Spring Boot specific
+application-local.properties
+application-secret.properties
+
+# Logs
+*.log
+logs/
+
+# Compiled class files
+*.class
+
+# Build artifacts 
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
