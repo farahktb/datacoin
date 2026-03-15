@@ -588,7 +588,7 @@ If you ever want persistent data (data that survives restarts), you'd switch to 
 
 ---
 
-## 👤 Author
+## 👤 FARAH KHATTABI
 
 Built as a data engineering portfolio project demonstrating:
 - RESTful API design with Spring Boot
